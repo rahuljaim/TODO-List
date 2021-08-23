@@ -65,38 +65,28 @@ const TASK_HEADER_MAPPING = {
 };
 
 const TaskItems = ({ selectedTab, tasks }) => {
+  let tasksToRender = [...tasks];
   if (selectedTab === "NEXT_7") {
-    return tasks
-      .filter(
-        (task) =>
-          isAfter(task.date, new Date()) &&
-          isBefore(task.date, addDays(new Date(), 7))
-      )
-      .map((task) => (
-        <p>
-          {" "}
-          {task.text} {dateFnsFormat(new Date(task.date), FORMAT)}{" "}
-        </p>
-      ));
+    tasksToRender = tasksToRender.filter(
+      (task) =>
+        isAfter(task.date, new Date()) &&
+        isBefore(task.date, addDays(new Date(), 7))
+    );
   }
   if (selectedTab === "TODAY") {
-    return tasks
-      .filter((task) => isToday(task.date))
-
-      .map((task) => (
-        <p>
-          {" "}
-          {task.text} {dateFnsFormat(new Date(task.date), FORMAT)}{" "}
-        </p>
-      ));
+    tasksToRender = tasksToRender.filter((task) => isToday(task.date));
   }
 
-  return tasks.map((task) => (
-    <p>
-      {" "}
-      {task.text} {dateFnsFormat(new Date(task.date), FORMAT)}{" "}
-    </p>
-  ));
+  return (
+    <div className="task-items-container">
+      {tasksToRender.map((task) => (
+        <div className="task-item">
+          <p>{task.text}</p>
+          <p>{dateFnsFormat(new Date(task.date), FORMAT)}</p>
+        </div>
+      ))}
+    </div>
+  );
 };
 const Tasks = ({ selectedTab }) => {
   const [showAddTask, setShowAddTask] = useState(false);
@@ -109,13 +99,15 @@ const Tasks = ({ selectedTab }) => {
   return (
     <div className="tasks">
       <h1>{TASK_HEADER_MAPPING[selectedTab]}</h1>
-      <div
-        className="add-task-btn"
-        onClick={() => setShowAddTask((prevState) => !prevState)}
-      >
-        <span className="plus">+</span>
-        <span className="add-task-text">Add Task</span>
-      </div>
+      {selectedTab === "INBOX" ? (
+        <div
+          className="add-task-btn"
+          onClick={() => setShowAddTask((prevState) => !prevState)}
+        >
+          <span className="plus">+</span>
+          <span className="add-task-text">Add Task</span>
+        </div>
+      ) : null}
       {showAddTask && (
         <AddTask
           onAddTask={addNewTask}
